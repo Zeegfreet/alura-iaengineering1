@@ -1,0 +1,22 @@
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { Input } from './Input'
+
+describe('Input', () => {
+  it('renders with placeholder', () => {
+    render(<Input placeholder="Type here" />)
+    expect(screen.getByPlaceholderText('Type here')).toBeInTheDocument()
+  })
+
+  it('calls onChange when user types', async () => {
+    const onChange = vi.fn()
+    render(<Input onChange={onChange} />)
+    await userEvent.type(screen.getByRole('textbox'), 'hello')
+    expect(onChange).toHaveBeenCalled()
+  })
+
+  it('renders as password type', () => {
+    render(<Input type="password" data-testid="pwd" />)
+    expect(screen.getByTestId('pwd')).toHaveAttribute('type', 'password')
+  })
+})
