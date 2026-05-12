@@ -11,14 +11,15 @@ import { FormField } from '../../molecules/FormField'
 import { SocialLoginButton } from '../../molecules/SocialLoginButton'
 
 function errorMessage(error: AuthError): string {
-  if (error.status === 401) return 'Email ou senha inválidos.'
+  if (error.status === 409) return 'Este email já está em uso.'
   if (error.status === 400) return error.message
   return 'Não foi possível conectar. Tente novamente.'
 }
 
-export function LoginForm() {
+export function RegisterForm() {
   const navigate = useNavigate()
-  const { signIn } = useAuth()
+  const { signUp } = useAuth()
+  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [rememberMe, setRememberMe] = useState(false)
@@ -30,7 +31,7 @@ export function LoginForm() {
     setError(null)
     setIsSubmitting(true)
     try {
-      await signIn({ email, password })
+      await signUp({ name, email, password })
       navigate('/home')
     } catch (err) {
       setError(errorMessage(err as AuthError))
@@ -42,16 +43,24 @@ export function LoginForm() {
   return (
     <div className="flex flex-col gap-6 py-4">
       <div className="flex flex-col gap-1">
-        <h1 className="text-3xl font-semibold text-neutral-100">Login</h1>
-        <p className="text-lg text-neutral-300">Boas-vindas! Faça seu login.</p>
+        <h1 className="text-3xl font-semibold text-neutral-100">Cadastro</h1>
+        <p className="text-lg text-neutral-300">Olá! Preencha seus dados.</p>
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
         <FormField
+          id="name"
+          label="Nome"
+          placeholder="Nome completo"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+
+        <FormField
           id="email"
-          label="Email ou usuário"
+          label="Email"
           type="email"
-          placeholder="usuario@exemplo.com"
+          placeholder="Digite seu email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
@@ -66,21 +75,12 @@ export function LoginForm() {
             onChange={(e) => setPassword(e.target.value)}
           />
 
-          <div className="flex items-center justify-between">
-            <Checkbox
-              id="remember"
-              label="Lembrar-me"
-              checked={rememberMe}
-              onChange={(e) => setRememberMe(e.target.checked)}
-            />
-            <button
-              type="button"
-              className="text-sm text-neutral-300 underline underline-offset-2 hover:text-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-400 rounded"
-              onClick={() => console.log('forgot-password')}
-            >
-              Esqueci a senha
-            </button>
-          </div>
+          <Checkbox
+            id="remember"
+            label="Lembrar-me"
+            checked={rememberMe}
+            onChange={(e) => setRememberMe(e.target.checked)}
+          />
         </div>
 
         {error && (
@@ -89,8 +89,8 @@ export function LoginForm() {
           </p>
         )}
 
-        <Button type="submit" size="lg" className="w-full font-bold" disabled={isSubmitting}>
-          {isSubmitting ? 'Entrando...' : 'Login →'}
+        <Button type="submit" size="lg" className="w-full font-semibold" disabled={isSubmitting}>
+          {isSubmitting ? 'Cadastrando...' : 'Cadastrar →'}
         </Button>
       </form>
 
@@ -110,13 +110,13 @@ export function LoginForm() {
       </div>
 
       <p className="text-center text-sm text-neutral-400">
-        Ainda não tem conta?{' '}
+        Já tem conta?{' '}
         <button
           type="button"
           className="font-semibold text-lime-400 hover:text-lime-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-400 rounded"
-          onClick={() => navigate('/cadastro')}
+          onClick={() => navigate('/login')}
         >
-          Crie seu cadastro! 📋
+          Faça seu login! →
         </button>
       </p>
     </div>
